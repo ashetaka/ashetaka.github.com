@@ -12,5 +12,3 @@ tagline: learn,learn and learn
 </ul>
 
 
-
-
