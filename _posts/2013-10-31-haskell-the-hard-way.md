@@ -107,7 +107,7 @@ here is a pic
 	   return 0;
 	}
 	
-结构是相同的，但是有一些语法差异。折耳根教程的主要部分将会专门解释为什么。
+结构是相同的，但是有一些语法差异。这篇教程的主要部分将会专门解释为什么。
 
 在 Haskell 里有一个 main 函数，并且每个对象都有一种类型。main 的类型是 IO()。这意味着 main会有副作用。
 
@@ -1761,3 +1761,271 @@ Haskell 把 world 的状态当做`main`的输入变量。但是 main 的真正�
 设想要是没有`(>>)`和`(>>=)`它会成什么样。
 
 ## 4.3 Monads
+
+here is a pic
+
+现在可以揭开谜底了：`IO`是个 monad。成为 monad 意味着你能用`do`表示法来访问一些语法糖。但是主要来说，你得到了一种编码模式，它能简化你的代码流。
+
+> 重要备注:
+> 
+> - monad不是必须有关副作用！实际上有许多纯 monad
+> - monad 更加有关的是排序
+
+Haskell 中，`Moad`是一种类型类。要成为这种类型类的实例，你必须提供函数`(>>=)`和`return`。函数`(>>)`由`(>>=)`衍生而来。下面的代码介绍了类型类`Monad`是如何(基本地)定义的：
+
+	class Monad m  where
+	  (>>=) :: m a -> (a -> m b) -> m b
+	  return :: a -> m a
+	
+	  (>>) :: m a -> m b -> m b
+	  f >> g = f >>= \_ -> g
+	
+	  -- You should generally safely ignore this function
+	  -- which I believe exists for historical reasons
+	  fail :: String -> m a
+	  fail = error
+
+> 备注：
+
+> - 关键字`class`不是你的朋友。一个 Haskell 类不是面向对象编程中的那种类。它与 Java 的接口有许多相似点。一个更好的词是`typeclass`，因为那代表一系列类型。对于属于类中的一个类型，类的所有函数必须支持这种类型
+> - 这个特别的类型类例子中，类型`m`m 必须是采用一个参数的类型。比如说，`IO a`，`Maybe a`，`[a]`等等都是。
+> - 要成为有用的 monad，你的函数必须遵循一些规则。如果你的构造不遵循这些规则，会发生奇怪的事情：
+> 
+> ~ return a >>= k ==k a m >>= return == m m >>= (-> k x >>= h ) == ( m >>= k ) >>= h ~
+
+### 4.3.1 Maybe 是种 monad
+有许多不同的类型是`Monad`的实例。其中最容易描述中的一种是`Maybe`。如果你有一串`Maybe`值，你可以使用 monads 来操控它们。它会特别有用当你要移除像`if..then..else..`这样的深构造时。
+
+设想有一个复杂的银行操作。你只有在跟随一些列操作后还保持余额大于0的情况下才有资格获得大约700€ 。
+
+	deposit  value account = account + value
+	withdraw value account = account - value
+	
+	eligible :: (Num a,Ord a) => a -> Bool
+	eligible account =
+	  let account1 = deposit 100 account in
+	    if (account1 < 0)
+	    then False
+	    else
+	      let account2 = withdraw 200 account1 in
+	      if (account2 < 0)
+	      then False
+	      else
+	        let account3 = deposit 100 account2 in
+	        if (account3 < 0)
+	        then False
+	        else
+	          let account4 = withdraw 300 account3 in
+	          if (account4 < 0)
+	          then False
+	          else
+	            let account5 = deposit 1000 account4 in
+	            if (account5 < 0)
+	            then False
+	            else
+	              True
+	
+	main = do
+	  print $ eligible 300 -- True
+	  print $ eligible 299 -- False
+
+现在，我们用 Maybe 来改善它，并且实际上这是个 Monad
+
+	deposit :: (Num a) => a -> a -> Maybe a
+	deposit value account = Just (account + value)
+	
+	withdraw :: (Num a,Ord a) => a -> a -> Maybe a
+	withdraw value account = if (account < value) 
+	                         then Nothing 
+	                         else Just (account - value)
+	
+	eligible :: (Num a, Ord a) => a -> Maybe Bool
+	eligible account = do
+	  account1 <- deposit 100 account 
+	  account2 <- withdraw 200 account1 
+	  account3 <- deposit 100 account2 
+	  account4 <- withdraw 300 account3 
+	  account5 <- deposit 1000 account4
+	  Just True
+	
+	main = do
+	  print $ eligible 300 -- Just True
+	  print $ eligible 299 -- Nothing
+
+
+还不错，不过我们甚至可以做的更好：
+
+	deposit :: (Num a) => a -> a -> Maybe a
+	deposit value account = Just (account + value)
+	
+	withdraw :: (Num a,Ord a) => a -> a -> Maybe a
+	withdraw value account = if (account < value) 
+	                         then Nothing 
+	                         else Just (account - value)
+	
+	eligible :: (Num a, Ord a) => a -> Maybe Bool
+	eligible account =
+	  deposit 100 account >>=
+	  withdraw 200 >>=
+	  deposit 100  >>=
+	  withdraw 300 >>=
+	  deposit 1000 >>
+	  return True
+	
+	main = do
+	  print $ eligible 300 -- Just True
+	  print $ eligible 299 -- Nothing
+
+我们已经证明过 Monasd 是一种让带吗更简洁的好方法。注意下代码组织的想法，特别是`Maybe`可以被用在大多数命令式语言中。事实上这是我们自然而然创建的构造。
+
+> 重要备注：
+
+> 序列中值为`Nothing`的第一个元素会停止完整的运算。这意味着你不用执行所有的行。你免费得到了这一点，得益于惰性。
+
+你也可以在心里重做这些例子用`(>>=)`代替`Maybe`：
+
+	instance Monad Maybe where
+	    (>>=) :: Maybe a -> (a -> Maybe b) -> Maybe b
+	    Nothing  >>= _  = Nothing
+	    (Just x) >>= f  = f x
+	
+	    return x = Just x
+
+monad`Maybe`在简单的例子中被证明是十分有用的。我们看到了`IO`monad的实用。但是现在来个更酷的例子，列表。
+
+### 4.3.2 列表 monad
+here is a pic
+
+列表 monad 帮助我们模拟非确定性计算。我们开始吧：
+
+	import Control.Monad (guard)
+	
+	allCases = [1..10]
+	
+	resolve :: [(Int,Int,Int)]
+	resolve = do
+	              x <- allCases
+	              y <- allCases
+	              z <- allCases
+	              guard $ 4*x + 2*y < z
+	              return (x,y,z)
+	
+	main = do
+	  print resolve
+
+奇迹在此发生：
+
+	[(1,1,7),(1,1,8),(1,1,9),(1,1,10),(1,2,9),(1,2,10)]
+	
+列表 monad 也有这个语法糖：
+
+	  print $ [ (x,y,z) | x <- allCases,
+	                      y <- allCases,
+	                      z <- allCases,
+	                      4*x + 2*y < z ]
+
+我不会列举所有的 monads，只列表他们中的一部分。使用 monad 简化了春语言中一些概念的处理。特别地，monad 对于以下几项特别有帮助：
+
+- IO，
+- 非确定性计算，
+- 生成非随机数，
+- 保持配置状态，
+- 写的状态
+- ...
+
+你如果跟我到了这里，那证明你做到了！你知道了 monad **注解8**！
+
+# 5.附录
+
+这一部分和学习 Haskell 不是那么相关。只是顺便讨论下更多的细节。
+
+## 5.1 更多关于无限树的内容
+
+在*无限结构*这一章节中我们看到了简单的构造。不幸的是我们移除了树的两个属性：
+
+1. 没有重复的节点值
+2. 有序树
+
+在这一节中，我们会尝试保持第一个性质。至于第二个，我们必须放宽但我们会讨论如何尽可能的保持它。
+
+第一部是创建一个伪随机数列表：
+
+	shuffle = map (\x -> (x*3123) `mod` 4331) [1..]
+	
+作为提醒，这里是`treeFromList`的定义
+
+	treeFromList :: (Ord a) => [a] -> BinTree a
+	treeFromList []    = Empty
+	treeFromList (x:xs) = Node x (treeFromList (filter (<x) xs))
+                             (treeFromList (filter (>x) xs))
+                             
+以及`treeTakeDepth`的：
+
+	treeTakeDepth _ Empty = Empty
+	treeTakeDepth 0 _     = Empty
+	treeTakeDepth n (Node x left right) = let
+          	nl = treeTakeDepth (n-1) left
+          	nr = treeTakeDepth (n-1) right
+          	in
+              	Node x nl nr
+              	
+看一下下面代码的结果：
+
+	main = do
+	      putStrLn "take 10 shuffle"
+	      print $ take 10 shuffle
+	      putStrLn "\ntreeTakeDepth 4 (treeFromList shuffle)"
+	      print $ treeTakeDepth 4 (treeFromList shuffle)
+<br>
+
+	% runghc 02_Hard_Part/41_Infinites_Structures.lhs
+	take 10 shuffle
+	[3123,1915,707,3830,2622,1414,206,3329,2121,913]
+	treeTakeDepth 4 (treeFromList shuffle)
+	
+	< 3123
+	: |--1915
+	: |  |--707
+	: |  |  |--206
+	: |  |  `--1414
+	: |  `--2622
+	: |     |--2121
+	: |     `--2828
+	: `--3830
+	:    |--3329
+	:    |  |--3240
+	:    |  `--3535
+	:    `--4036
+	:       |--3947
+	:       `--4242
+
+耶！她结束了！不过要注意，它只有在你总是有东西可以放进分支的时候才能工作。
+
+比如说
+	      
+	treeTakeDepth 4 (treeFromList [1..]) 
+	
+会一直循环。原因很简单，它会一直试着访问`filter (<1) [2..]`的头部。但是`filter`不够聪明以至它不能明白结果是空列表。
+
+尽管如此，这依然是个很酷的例子，表明了不严格程序必须付出的代价。
+
+以下留作读者的练习：
+
+- 证明一个数字`n`的存在使`treeTakeDepth n (treeFromLis shuffle)`会进入无限循环。
+- 找到`n`的上界
+- 证明不存在`shuffle`使得程序能在任一深度结束
+
+为了解决这些问题，我们得稍微修改下`treeFromList`和`shuffle`函数。
+
+第一个问题是`shuffle`的执行中缺少无限不同的数字。我们只剩除了`4331`个不同的数字。为了解决这点，我们用一个稍微更好些的`shuffle`函数。
+
+	shuffle = map rand [1..]
+	          where 
+	              rand x = ((p x) `mod` (x+c)) - ((x+c) `div` 2)
+	              p x = m*x^2 + n*x + o -- some polynome
+	              m = 3123    
+	              n = 31
+	              o = 7641
+	              c = 1237
+
+
