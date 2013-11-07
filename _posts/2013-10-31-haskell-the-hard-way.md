@@ -18,26 +18,28 @@ tags: [Haskell]
 
 Haskell 则十分不同。它用了许多我以前从未听过的概念，其中的许多概念将会帮助你成为更好的程序员。
 
-但是学习 Haskell 是困难的。至少对我来说是这样。**这篇文章中我会试着提供一切我学习过程中所缺乏的。**
+但是学习 Haskell 是困难的。至少对我来说是这样。这篇文章中我会提供我学习时不明白的内容。
 
 这篇文章当然会很难追随。这是有意为之的。学习 Haskell 没有捷径，会是困难而且充满挑战的。但是我相信这是一件很好的事情。因为它的困难使得 Haskell 如此有趣。
 
 学习 Haskell 的常规方法是读两本书。第一本是"Learn You a Haskell",接着是"Real World Haskell"。我也相信这是正确的方式。但是为了学习 Haskell 的所有东西，你就不得不仔细地阅读它们。
 
-相反，这篇文章是对 Haskell 所有主要方面的一个简介而又密集的概述。我还增加了一些我学习 Haskell 过程中所缺乏的信息。
+相反，这篇文章是对 Haskell 所有主要方面的一个简介而又密集的概述。我还增加了一些我学习 Haskell 时不懂的内容。
 
 本文包含5个部分：
 
 - 简介：一个短小的例子来展示 Haskell 的友好。
 - Haskell 本质：Haskell 语法和一些基本概念。
-- 加深部分：
-		- 函数式风格；循序渐进的例子，从命令式风格到函数式风格
+- 噩梦：
+
+		- 函数式风格；一个循序渐进的例子，从命令式风格到函数式风格
 		- 类型；类型以及标准二叉树例子
 		- 无限结构；操作无限二叉树
-- 地狱级难度部分：
+- 地狱：
+
 		- 处理 IO；非常小的一个例子
-		- IO技巧解释；隐藏的我理解不够的细节
-		- Monads；不可思议到不足以概括的东西
+		- IO技巧解释；背后的我理解不够的细节
+		- Monads；不可思议到难以概括的东西
 - 附录：
 		- 更多关于无限树的东西；一个关于面向数学的无限树讨论
 		
@@ -418,7 +420,7 @@ Haskell 里字符串是一个所有元素都是`Char`型的列表。
 
 	符号警示：缩进在 Haskell 中十分重要。和 Python 一样，会缩进会毁了你的代码。
 	
-# 3. **困难部分**
+# 3. 噩梦
 现在开始增加难度。
 ##3.1 函数式风格
 here is a pic
@@ -1245,7 +1247,7 @@ here is a pic
 	:       |-- 1
 	:       `-- 3	
 	
-# 4.地狱级难度
+# 4.地狱
 
 恭喜你看到了这里！现在开始真正底层的东西。
 
@@ -2028,4 +2030,79 @@ here is a pic
 	              o = 7641
 	              c = 1237
 
+这个随机函数(但愿)拥有即无上限也无下限这个性质。但是有了更好的随机列表并不足以进入无限循环。
+
+通常我们无法知道`filter (<x) xs`是否是空的。于是要解决这个问题，我会批准二叉树生成时的一些错误。新版的代码能生成自身结点没有以下属性的二叉树：
+
+>左/右子树的任何元素必须严格小于/大于根结点。
+
+记得它将会基本保持为一个有序二叉树。此外，每个结点在生成时都是树中唯一的。
+
+下面是新的`treeFromList`。我们仅仅用`safefilter`代替了`filter`。
+
+	treeFromList :: (Ord a, Show a) => [a] -> BinTree a
+	treeFromList []    = Empty
+	treeFromList (x:xs) = Node x left right
+          	where 
+              	left = treeFromList $ safefilter (<x) xs
+              	right = treeFromList $ safefilter (>x) xs
+				
+新的函数`safefilter`基本等价于`filter`，但是在结果是有限列表的情况下不会进入无限循环。如果连续10000步以后还找不到一个判断为真的元素，那么它会被当做搜索的结束。
+
+	safefilter :: (a -> Bool) -> [a] -> [a]
+	safefilter f l = safefilter' f l nbTry
+  		where
+      		nbTry = 10000
+      	  	safefilter' _ _ 0 = []
+      	  	safefilter' _ [] _ = []
+      	  	safefilter' f (x:xs) n = 
+                  		if f x 
+                     		then x : safefilter' f xs nbTry 
+                     	   	else safefilter' f xs (n-1) 
+							
+现在开心地运行吧：
+
+	main = do
+      	putStrLn "take 10 shuffle"
+      	print $ take 10 shuffle
+      	putStrLn "\ntreeTakeDepth 8 (treeFromList shuffle)"
+      	print $ treeTakeDepth 8 (treeFromList $ shuffle)
+
+你应该意识到输出每个值的时间是不同的。这是因为 Haskell 只有在需要的时候才计算每个值。这种情况下，就是当被要求输出到屏幕的时候才计算。
+
+足够了，现在试着把深度从`8`扩大到`100`。它能正常工作而且没有杀了你的内存！流和内存管理是由 Haskell 自然地完成的。
+
+留给读者的练习：
+
+- 即使给`deep`和`nbTry`以大的常数，它看起来还是工作地不错。但是最糟糕的情况下，这会是指数级的。把最糟糕的列表作为参数传给`treeFromList`。
+提示：考虑下(`[0,-1,-1,....,-1,1,-1,...,-1,1,...]`)。
+- 我起初这样来实现`safefilter`：
+
+		safefilter' f l = if filter f (take 10000 1) == []
+									then []
+									else filter f l
+解释下为什么它不能工作而进入无限循环。
+- 假如`shuffle`是上限渐渐增长的真随机列表。如果你了解过这个结构，你会发现在 可能性1 下，这个结构是有限的。用下面的代码(假定我们能直接用`safefilter'`就好像它不在 safefilter 中 where 子句中)来找到`f`的定义，使得在可能性`1`下 treeFromList'随机是无限的。并证明它。免责声明，这只是个猜想。
+	
+	
+		treeFromList' []  n = Empty
+		treeFromList' (x:xs) n = Node x left right
+    		where
+        		left = treeFromList' (safefilter' (<x) xs (f n)
+        		right = treeFromList' (safefilter' (>x) xs (f n)
+        		f = ??? 
+
+# 6.感谢
+感谢[/r/haskell](http://reddit.com/r/haskell)和[/r/programming](http://reddit.com/r/programming)。你们的评论是最受欢迎的。
+
+特别地，我想感谢[Emm](https://github.com/Emm) 一千次，因为他改正了我的英语。谢谢兄弟。
+
+1. 即使大部分近期的语言都试着隐藏他们，但还是存在。↩
+2. 我知道我作弊了。但我稍后会讨论非严格性。
+3. 这里有篇更完整的类型匹配的解释。
+4. 注意到`squareEvenSum''`比另两种方法更高效。所以`(.)`的顺序是很重要的。
+5. 这很类似于 JavaScript 的对包含 JSON 字符串的`eval`操作。
+6. 对这个规则有一些不安全的异常。但是你不会在真实应用中看到这种用发，除非 maybe 被用来 debug。
+7. 对于好奇的人们，真正的类型是`data IO a = IO {unIO :: State# RealWorld -> (# State# RealWorld, a #)}。所有的`#`都以最优化执行，而且我在例子中交换了位置。但是这是基本思想。
+8. 当然，你需要稍微练习下才能在使用他们和创建自己的程序时习惯和理解。不过你已经朝这个方向迈了一大步了。
 
