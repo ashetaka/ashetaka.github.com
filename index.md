@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Ashitaka
+title: Ashitaka的博客
 tagline: learn,learn and learn
 ---
 {% include JB/setup %}
