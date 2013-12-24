@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Mac OS X上编译安装 PHP"
+title: "[乱]Mac OS X上编译安装 PHP"
 description: ""
 category: ""
 tags: [php,osx]
@@ -51,3 +51,6 @@ OS X 更新到10.9以后不知不觉把/etc/下的 php.ini 弄没了，好多原
 	
 再开浏览器看测试页面，终于是5.5.7的了。
 
+#### 参考资料：
+
+http://www.linuxfromscratch.org/blfs/view/svn/general/php.html
