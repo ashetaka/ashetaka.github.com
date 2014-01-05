@@ -13,8 +13,8 @@ tags: [php]
 
 这样的代码行是很常见的：
 
-{% highlight php %}
-	require_once('../../lib/some_class.php');
+{% highlight php startinline %}
+require_once('../../lib/some_class.php');
 {% endhighlight %}	
 
 这种做法有很多弊端：
@@ -27,23 +27,23 @@ tags: [php]
 
 因此用绝对路径是个好主意：
 
-{% highlight php %}
-	define('ROOT','/var/www/project');
-	require_once(ROOT . '../../lib/some_class.php');
+{% highlight php startinline %}
+define('ROOT','/var/www/project');
+require_once(ROOT . '../../lib/some_class.php');
 
-	//代码剩余部分
+//代码剩余部分
 {% endhighlight %}	
 
 现在这是个绝对路径了并且会保持不变。但是我们可以改进更多。/var/www/project这个目录要是变了，难道我们每次都去修改它吗？不。相反，我们通过使用__FILE__这样的魔法常量来使它更方便。仔细看看：
 
-{% highlight php %}
-	//假设脚本为 /var/www/project/index.php
-	//那么__FILE__ 会试那个完整路径
+{% highlight php startinline %}
+//假设脚本为 /var/www/project/index.php
+//那么__FILE__ 会试那个完整路径
 
-	define('ROOT', pathinfo(__FILE__, PATHINFO_DIRNAME));
-	require_once(ROOT . '../../lib/some_class.php');
+define('ROOT', pathinfo(__FILE__, PATHINFO_DIRNAME));
+require_once(ROOT . '../../lib/some_class.php');
 
-	//代码剩余部分
+//代码剩余部分
 {% endhighlight %}	
 
 因此现在即使你把你的工程移到别的目录，比如移到线上服务器，同样的代码也可以不做任何改变就运行良好。
@@ -52,39 +52,39 @@ tags: [php]
 
 你的脚本也许会在顶部包含不同的文件，诸如像这样的类库、公用函数和辅助函数等等：
 
-{% highlight php %}
-	require_once('lib/Datavase.php');
-	require_once('lib/Mail.php');
+{% highlight php startinline %}
+require_once('lib/Datavase.php');
+require_once('lib/Mail.php');
 
-	require_once('helpers/utitlity_functions.php');
+require_once('helpers/utitlity_functions.php');
 {% endhighlight %}	
 
 这是十分粗糙的。代码需要更加灵活些。详细写些辅助函数来更容易地包含文件。举个例子：
 
-{% highlight php %}
-	function load_class($class_name){
-		//类文件的路径
-		$path = ROOT . '/lib' . $class_name . '.php';
-		require_once( $path );
-	}
+{% highlight php startinline %}
+function load_class($class_name){
+	//类文件的路径
+	$path = ROOT . '/lib' . $class_name . '.php';
+	require_once( $path );
+}
 
-	load_class('Database');
-	load_class('Mail');
+load_class('Database');
+load_class('Mail');
 {% endhighlight %}	
 
 看到不同之处了吗？你肯定看到了。不需要更多解释了。
 
 你可以改得更好如果你愿意这样的话：
 
-{% highlight php %}
-	function load_class($class_name){
-		//类文件的路径
-		$path = ROOT . '/lib' . $class_name . '.php';
+{% highlight php startinline %}
+function load_class($class_name){
+	//类文件的路径
+	$path = ROOT . '/lib' . $class_name . '.php';
 
-		if (file_exists($path)){
-			require_once($path);
-		}
+	if (file_exists($path)){
+		require_once($path);
 	}
+}
 {% endhighlight %}	
 
 利用这点可以做很多事情：
@@ -99,117 +99,117 @@ tags: [php]
 
 在你的开发机上你可以这样做：
 
-{% highlight php %}
-	define('ENVIRONMENT' , 'development');
+{% highlight php startinline %}
+define('ENVIRONMENT' , 'development');
 
-	if (! $db->query( $query )){
-		if (ENVIRONMENT == 'development'){
-			echo "$query failed";
-		}
-		else{
-			echo "Database error. Please contact administrator";
-		}
+if (! $db->query( $query )){
+	if (ENVIRONMENT == 'development'){
+		echo "$query failed";
 	}
+	else{
+		echo "Database error. Please contact administrator";
+	}
+}
 {% endhighlight %}	
 
 然后服务器上你可以这么做：
 
-{% highlight php %}
-	define('ENVIRONMENT' , 'production');
+{% highlight php startinline %}
+define('ENVIRONMENT' , 'production');
 
-	if (! $db->query( $query )){
-		if (ENVIRONMENT == 'development'){
-			echo "$query failed";
-		}
-		else{
-			echo "Database error. Please contact administrator";
-		}
+if (! $db->query( $query )){
+	if (ENVIRONMENT == 'development'){
+		echo "$query failed";
 	}
+	else{
+		echo "Database error. Please contact administrator";
+	}
+}
 {% endhighlight %}	
 
 ### 4.通过会话(session)来传递状态信息
 
 状态信息是指做完一个任务后产生的信息。
 
-{% highlight php %}
-	<?php
-		if ($wrong_username || $wrong_password){
-			$msg = 'Invalid username or password';
-		}
-	?>
-	<html>
-	<body>
+{% highlight php startinline %}
+<?php
+	if ($wrong_username || $wrong_password){
+		$msg = 'Invalid username or password';
+	}
+?>
+<html>
+<body>
 
-	<?php echo $msg;?>
+<?php echo $msg;?>
 
-	<form>
-	...
-	</form>
-	</body>
-	</html>
+<form>
+...
+</form>
+</body>
+</html>
 {% endhighlight %}	
 
 这样的代码是很常见的。使用变量来说明状态信息有局限性。他们不能通过重定向被传送(除非你把他们当做GET变量传到下一个脚本，但这样是很愚蠢的)。在大型脚本中，可能会有许多的信息。
 
 最好的方法是使用会话来传递他们(即使在同一个页面)。对于这种情况，需要在每个页面有个session_start。
 
-{% highlight php %}
-	function set_flash($msg){
-		$_SESSION['message'] = $msg;
-	}
+{% highlight php startinline %}
+function set_flash($msg){
+	$_SESSION['message'] = $msg;
+}
 
-	function get_flash(){
-		$msg = $_SESSION['message'];
-		unset($_SESSION['message']);
-		return $msg;
-	}
+function get_flash(){
+	$msg = $_SESSION['message'];
+	unset($_SESSION['message']);
+	return $msg;
+}
 {% endhighlight %}	
 
 脚本如下:
 
-{% highlight php %}
-	<?php
-		if ($wrong_username || $wrong_password){
-			set_flash('Invalid username or password');
-		}
-	?>
-	<html>
-	<body>
+{% highlight php startinline %}
+<?php
+	if ($wrong_username || $wrong_password){
+		set_flash('Invalid username or password');
+	}
+?>
+<html>
+<body>
 
-	status is : <?php echo get_flash(); ?>
-	<form>
-	...
-	</form>
-	</body>
-	</html>
+status is : <?php echo get_flash(); ?>
+<form>
+...
+</form>
+</body>
+</html>
 {% endhighlight %}	
 
 ### 5.让你的函数更灵活
 
-{% highlight php %}
-	function add_to_cart($item_id,$qty){
-		$_SESSION['cart'][$item_id] = $qty;
-	}
+{% highlight php startinline %}
+function add_to_cart($item_id,$qty){
+	$_SESSION['cart'][$item_id] = $qty;
+}
 
-	add_to_cart( 'IPHONE3' , 2);
+add_to_cart( 'IPHONE3' , 2);
 {% endhighlight %}	
 
 当要添加一个物品时你可以用上面的函数。当要添加多个物品时，你会创建另一个函数吗？不用。只要让函数灵活到能够接受不同类别的参数就行了。下面仔细看看：
 
-{% highlight php %}
-	function add_to_cart($item , $qty){
-		if (!is_array($item_id)){
-			$_SESSION['cart'][$item_id] = $qty;
-		}
-		else{
-			foreach ($item_is as $i_id=>$qty){
-				$_SESSION['cart'][$i_id] = $qty;
-			}
+{% highlight php startinline %}
+function add_to_cart($item , $qty){
+	if (!is_array($item_id)){
+		$_SESSION['cart'][$item_id] = $qty;
+	}
+	else{
+		foreach ($item_is as $i_id=>$qty){
+			$_SESSION['cart'][$i_id] = $qty;
 		}
 	}
+}
 
-	add_to_cart( 'IPHONE3' ,2);
-	add_to_cart( array('IPHONE3'=>2,'IPAD'=>5));
+add_to_cart( 'IPHONE3' ,2);
+add_to_cart( array('IPHONE3'=>2,'IPAD'=>5));
 {% endhighlight %}	
 
 所以现在同一个函数可以接受不同类别的输入。上面的方法可以在许多地方应用来让你的代码更敏捷。
@@ -218,49 +218,49 @@ tags: [php]
 
 我好奇为什么这条贴士在如此多的关于php贴士的博文中被忽略了。
 
-{% highlight php %}
-	<?php
-		echo "Hello";
+{% highlight php startinline %}
+<?php
+	echo "Hello";
 
-	// Now dont close this tag
+// Now dont close this tag
 {% endhighlight %}	
 
 这将节省你大量的问题。来看个例子：
 
 类文件super_class.php
 
-{% highlight php %}
-	<?php
-	class super_class{
-		function super_function(){
-			//super code
-		}
+{% highlight php startinline %}
+<?php
+class super_class{
+	function super_function(){
+		//super code
 	}
-	?>
-	//super extra character after the closing tag
+}
+?>
+//super extra character after the closing tag
 {% endhighlight %}	
 
 index.php
 
-{% highlight php %}
-	require_once('super_class.php');
+{% highlight php startinline %}
+require_once('super_class.php');
 
-	//echo an image or pdf, or set the cookies or session data
+//echo an image or pdf, or set the cookies or session data
 {% endhighlight %}	
 
 现在你会得到“Headers already send error”错误。为什么呢？因为“super extra character”被打印出来了，然后所有的头部跟在那后面。现在你开始调试。你可能会浪费很多时间来找出这个位置。
 
 因此把省略闭合标签作为习惯吧：
 
-{% highlight php %}
-	<?php
-	class super_class{
-		function super_function(){
-			//super code
-		}
+{% highlight php startinline %}
+<?php
+class super_class{
+	function super_function(){
+		//super code
 	}
+}
 
-	//No closing tag
+//No closing tag
 {% endhighlight %}	
 
 这样好多了
@@ -269,39 +269,39 @@ index.php
 
 这就是所谓的输出缓冲。假设你已经像这样从不同的函数输出内容：
 
-{% highlight php %}
-	function print_header(){
-		echo "<div id='header'>Site Log and Login links</div>";
-	}
-	function print_footer(){
-		echo "<div id='footer'>Site was made by me</div>";
-	}
+{% highlight php startinline %}
+function print_header(){
+	echo "<div id='header'>Site Log and Login links</div>";
+}
+function print_footer(){
+	echo "<div id='footer'>Site was made by me</div>";
+}
 
-	print_header();
-	for ($i = 0l $i < 100; $i++){
-		echo "I is : $i <br />";
-	}
-	print_footer();
+print_header();
+for ($i = 0l $i < 100; $i++){
+	echo "I is : $i <br />";
+}
+print_footer();
 {% endhighlight %}	
 
 代替那样做，首先收集所有的输出在一个位置。你可以在函数中把它存到变量里，也可以用ob_start和ob_end_clean。因此现在看起来是这样的
 
-{% highlight php %}
-	function print_header(){
-		$o = "<div id='header'>Site Log and Login links</div>";
-		return $o;
-	}
+{% highlight php startinline %}
+function print_header(){
+	$o = "<div id='header'>Site Log and Login links</div>";
+	return $o;
+}
 
-	function print_footer(){
-		$o = "<div id='footer'>Site was made by me</div>";
-		return $o;
-	}
+function print_footer(){
+	$o = "<div id='footer'>Site was made by me</div>";
+	return $o;
+}
 
-	echo print_header();
-	for ($i = 0; $i < 100; $i++){
-		echo "I is : $i <br />";
-	}
-	echo print_footer();
+echo print_header();
+for ($i = 0; $i < 100; $i++){
+	echo "I is : $i <br />";
+}
+echo print_footer();
 {% endhighlight %}	
 
 因此你应该做输出缓冲的理由是：
@@ -313,27 +313,27 @@ index.php
 
 我们输出一些xml试试。
 
-{% highlight php %}
-	$xml = '<?xml version="1.0" encoding="utf-8" standalone="yes"?>';
-	$xml = "<response>
-		<code>0</code>
-		</response>";
+{% highlight php startinline %}
+$xml = '<?xml version="1.0" encoding="utf-8" standalone="yes"?>';
+$xml = "<response>
+	<code>0</code>
+	</response>";
 
-	//Send xml data
-	echo $xml;
+//Send xml data
+echo $xml;
 {% endhighlight %}	
 
 完好运行。但是这需要一些改进。
 
-{% highlight php %}
-	$xml = '<?xml version="1.0" encoding="utf-8" standalone="yes"?>';
-	$xml = "<response>
-		<code>0</code>
-		</response>";
+{% highlight php startinline %}
+$xml = '<?xml version="1.0" encoding="utf-8" standalone="yes"?>';
+$xml = "<response>
+	<code>0</code>
+	</response>";
 
-	//Send xml data
-	header("content-type: text/xml");
-	echo $xml;
+//Send xml data
+header("content-type: text/xml");
+echo $xml;
 {% endhighlight %}	
 
 注意看header那一行。那一行告诉浏览器这是xml内容。所以浏览器能正确处理它。许多js库也依赖头部信息。
@@ -342,39 +342,39 @@ index.php
 
 Javascript
 
-{% highlight php %}
-	header("content-type:application/x-javascript");
-	echo "var a = 10";
+{% highlight php startinline %}
+header("content-type:application/x-javascript");
+echo "var a = 10";
 {% endhighlight %}	
 
 CSS
 
-{% highlight php %}
-	header("content-type: text/css");
-	echo "#div id {background:#000; }";
+{% highlight php startinline %}
+header("content-type: text/css");
+echo "#div id {background:#000; }";
 {% endhighlight %}	
 
 ### 9.为mysql链接设置正确地编码
 
 曾近遇上过这样一个问题，mysql表里正确地存储着unicode/utf-8编码的数据，phpmyadmin也显示正确，但是当你获取他们并把他们输出到你的页面上，他们并没有正确显示。秘密在于mysql的连接字符编码。
 
-{% highlight php %}
-	$host = 'localhost';
-	$username = 'root';
-	$password = 'super_secret';
+{% highlight php startinline %}
+$host = 'localhost';
+$username = 'root';
+$password = 'super_secret';
 
-	//尝试连接到数据库
-	$c = mysqli_connect($host , $username , $password);
+//尝试连接到数据库
+$c = mysqli_connect($host , $username , $password);
 
-	//检查连接有效性
-	if (!$c){
-		die("Could not connect to the database host: <br>" . mysqli_connect_error());
-	}
+//检查连接有效性
+if (!$c){
+	die("Could not connect to the database host: <br>" . mysqli_connect_error());
+}
 
-	//设置连接的字符集
-	if (!mysqli_set_charset( $c , 'UTF8' )){
-		die('mysqli_set_charset() failed');
-	}
+//设置连接的字符集
+if (!mysqli_set_charset( $c , 'UTF8' )){
+	die('mysqli_set_charset() failed');
+}
 {% endhighlight %}	
 
 一旦你连接到数据库，设置连接的字符集是个好主意。当你在应用中处理多种语言时这么做是必须得。
@@ -385,8 +385,8 @@ CSS
 
 在php 5.4之前，默认的字符编码用的是ISO-8859-1，它不能显示À â 这样的字符。
 
-{% highlight php %}
-	$value = htmlentities($this->value , ENT_QUOTES , 'UTF-8');
+{% highlight php startinline %}
+$value = htmlentities($this->value , ENT_QUOTES , 'UTF-8');
 {% endhighlight %}	
 
 php 5.4之后的版本默认编码改为utf-8，这解决了许多问题，但清楚这一点仍然是推荐的如果你的应用是多语言的。
