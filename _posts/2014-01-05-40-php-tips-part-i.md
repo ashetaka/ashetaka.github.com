@@ -13,7 +13,7 @@ tags: [php]
 
 这样的代码行是很常见的：
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 require_once('../../lib/some_class.php');
 {% endhighlight %}	
 
@@ -27,7 +27,7 @@ require_once('../../lib/some_class.php');
 
 因此用绝对路径是个好主意：
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 define('ROOT','/var/www/project');
 require_once(ROOT . '../../lib/some_class.php');
 
@@ -36,7 +36,7 @@ require_once(ROOT . '../../lib/some_class.php');
 
 现在这是个绝对路径了并且会保持不变。但是我们可以改进更多。/var/www/project这个目录要是变了，难道我们每次都去修改它吗？不。相反，我们通过使用__FILE__这样的魔法常量来使它更方便。仔细看看：
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 //假设脚本为 /var/www/project/index.php
 //那么__FILE__ 会试那个完整路径
 
@@ -52,7 +52,7 @@ require_once(ROOT . '../../lib/some_class.php');
 
 你的脚本也许会在顶部包含不同的文件，诸如像这样的类库、公用函数和辅助函数等等：
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 require_once('lib/Datavase.php');
 require_once('lib/Mail.php');
 
@@ -61,7 +61,7 @@ require_once('helpers/utitlity_functions.php');
 
 这是十分粗糙的。代码需要更加灵活些。详细写些辅助函数来更容易地包含文件。举个例子：
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 function load_class($class_name){
 	//类文件的路径
 	$path = ROOT . '/lib' . $class_name . '.php';
@@ -76,7 +76,7 @@ load_class('Mail');
 
 你可以改得更好如果你愿意这样的话：
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 function load_class($class_name){
 	//类文件的路径
 	$path = ROOT . '/lib' . $class_name . '.php';
@@ -99,7 +99,7 @@ function load_class($class_name){
 
 在你的开发机上你可以这样做：
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 define('ENVIRONMENT' , 'development');
 
 if (! $db->query( $query )){
@@ -114,7 +114,7 @@ if (! $db->query( $query )){
 
 然后服务器上你可以这么做：
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 define('ENVIRONMENT' , 'production');
 
 if (! $db->query( $query )){
@@ -131,7 +131,7 @@ if (! $db->query( $query )){
 
 状态信息是指做完一个任务后产生的信息。
 
-{% highlight php startinline %}
+{% highlight html+php startinline linenos  %}
 <?php
 	if ($wrong_username || $wrong_password){
 		$msg = 'Invalid username or password';
@@ -153,7 +153,7 @@ if (! $db->query( $query )){
 
 最好的方法是使用会话来传递他们(即使在同一个页面)。对于这种情况，需要在每个页面有个session_start。
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 function set_flash($msg){
 	$_SESSION['message'] = $msg;
 }
@@ -167,7 +167,7 @@ function get_flash(){
 
 脚本如下:
 
-{% highlight php startinline %}
+{% highlight html+php startinline linenos  %}
 <?php
 	if ($wrong_username || $wrong_password){
 		set_flash('Invalid username or password');
@@ -186,7 +186,7 @@ status is : <?php echo get_flash(); ?>
 
 ### 5.让你的函数更灵活
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 function add_to_cart($item_id,$qty){
 	$_SESSION['cart'][$item_id] = $qty;
 }
@@ -196,7 +196,7 @@ add_to_cart( 'IPHONE3' , 2);
 
 当要添加一个物品时你可以用上面的函数。当要添加多个物品时，你会创建另一个函数吗？不用。只要让函数灵活到能够接受不同类别的参数就行了。下面仔细看看：
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 function add_to_cart($item , $qty){
 	if (!is_array($item_id)){
 		$_SESSION['cart'][$item_id] = $qty;
@@ -218,7 +218,7 @@ add_to_cart( array('IPHONE3'=>2,'IPAD'=>5));
 
 我好奇为什么这条贴士在如此多的关于php贴士的博文中被忽略了。
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 <?php
 	echo "Hello";
 
@@ -229,7 +229,7 @@ add_to_cart( array('IPHONE3'=>2,'IPAD'=>5));
 
 类文件super_class.php
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 <?php
 class super_class{
 	function super_function(){
@@ -242,7 +242,7 @@ class super_class{
 
 index.php
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 require_once('super_class.php');
 
 //echo an image or pdf, or set the cookies or session data
@@ -252,7 +252,7 @@ require_once('super_class.php');
 
 因此把省略闭合标签作为习惯吧：
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 <?php
 class super_class{
 	function super_function(){
@@ -269,7 +269,7 @@ class super_class{
 
 这就是所谓的输出缓冲。假设你已经像这样从不同的函数输出内容：
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 function print_header(){
 	echo "<div id='header'>Site Log and Login links</div>";
 }
@@ -286,7 +286,7 @@ print_footer();
 
 代替那样做，首先收集所有的输出在一个位置。你可以在函数中把它存到变量里，也可以用ob_start和ob_end_clean。因此现在看起来是这样的
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 function print_header(){
 	$o = "<div id='header'>Site Log and Login links</div>";
 	return $o;
@@ -313,7 +313,7 @@ echo print_footer();
 
 我们输出一些xml试试。
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 $xml = '<?xml version="1.0" encoding="utf-8" standalone="yes"?>';
 $xml = "<response>
 	<code>0</code>
@@ -325,7 +325,7 @@ echo $xml;
 
 完好运行。但是这需要一些改进。
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 $xml = '<?xml version="1.0" encoding="utf-8" standalone="yes"?>';
 $xml = "<response>
 	<code>0</code>
@@ -342,14 +342,14 @@ echo $xml;
 
 Javascript
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 header("content-type:application/x-javascript");
 echo "var a = 10";
 {% endhighlight %}	
 
 CSS
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 header("content-type: text/css");
 echo "#div id {background:#000; }";
 {% endhighlight %}	
@@ -358,7 +358,7 @@ echo "#div id {background:#000; }";
 
 曾近遇上过这样一个问题，mysql表里正确地存储着unicode/utf-8编码的数据，phpmyadmin也显示正确，但是当你获取他们并把他们输出到你的页面上，他们并没有正确显示。秘密在于mysql的连接字符编码。
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 $host = 'localhost';
 $username = 'root';
 $password = 'super_secret';
@@ -385,7 +385,7 @@ if (!mysqli_set_charset( $c , 'UTF8' )){
 
 在php 5.4之前，默认的字符编码用的是ISO-8859-1，它不能显示À â 这样的字符。
 
-{% highlight php startinline %}
+{% highlight php startinline linenos  %}
 $value = htmlentities($this->value , ENT_QUOTES , 'UTF-8');
 {% endhighlight %}	
 
