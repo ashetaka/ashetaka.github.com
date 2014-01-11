@@ -333,3 +333,7 @@ ubuntu下的新立得包管理器很容易安装大部分开发工具。顶多�
 ### 可用资源：
 
 http://www.phptherightway.com/
+
+
+原文链接：
+[40+ Useful Php tips for beginners – Part 3](http://www.binarytides.com/40-techniques-to-enhance-your-php-code-part-3/)
