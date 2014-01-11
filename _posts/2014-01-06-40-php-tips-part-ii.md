@@ -366,11 +366,11 @@ echo 'Memory usage in MB after 3st copy (reference) : '. memory_get_usage() / 10
 
 在php5.4机器上运行的结果为：
 
-`Memory usage in MB : 18.08208
-Memory usage in MB after 1st copy : 27.930944
-Memory usage in MB after 2st copy : 37.779808
-Memory usage in MB after 3st copy (reference) : 37.779864
-`
+	Memory usage in MB : 18.08208
+	Memory usage in MB after 1st copy : 27.930944
+	Memory usage in MB after 2st copy : 37.779808
+	Memory usage in MB after 3st copy (reference) : 37.779864
+
 
 由此可以看到第三次通过引用实现的复制节省了内存。否则纯复制情形下内存会被用的越来越多知道耗尽。
 
