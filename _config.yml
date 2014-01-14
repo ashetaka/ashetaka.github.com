@@ -6,7 +6,7 @@ exclude: [".rvmrc", ".rbenv-version", "README.md", "Rakefile", "changelog.md"]
 pygments: true
 markdown: rdiscount
 # markdown: redcarpet
-
+paginate: 15
 redcarpet:
   extensions: ["tables"]
 # Themes are encouraged to use these universal variables 
