@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "[译]haskell the hard way"
+title: "haskell the hard way"
 description: ""
-category: ""
+category: "译"
 tags: [Haskell]
 ---
 {% include JB/setup %}

@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "[译]PHP40个有用建议-3"
+title: "PHP40个有用建议-3"
 description: ""
-category: ""
+category: "译"
 tags: [php]
 ---
 {% include JB/setup %}

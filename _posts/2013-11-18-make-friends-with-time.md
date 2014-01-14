@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "[读]把时间当作朋友"
+title: "把时间当作朋友"
 description: ""
-category: ""
+category: "读"
 tags: [读书]
 ---
 {% include JB/setup %}

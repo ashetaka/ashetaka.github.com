@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "[感]不是计划着失败，而是失败地计划"
+title: "不是计划着失败，而是失败地计划"
 description: ""
-category: ""
+category: "感"
 tags: [心情]
 ---
 {% include JB/setup %}

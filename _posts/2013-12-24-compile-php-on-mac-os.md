@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "[乱]Mac OS X上编译安装 PHP"
+title: "Mac OS X上编译安装 PHP"
 description: ""
 category: ""
 tags: [php,osx]
