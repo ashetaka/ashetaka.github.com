@@ -1,11 +1,20 @@
 ---
 layout: post
-title: "haskell the hard way"
+title: "努力快速学习Haskell"
 description: ""
 category: "译"
 tags: [Haskell]
 ---
 {% include JB/setup %}
+
+
+原文作者：Yann Esposito
+
+原文链接：http://yannesposito.com/Scratch/en/blog/Haskell-the-Hard-Way/
+
+译文正文：
+
+摘要：一篇短而密集的Haskell教程
 
 我有充分理由相信所有的开发人员都应该学习 Haskell。我并不是说每个人都需要成为超级 Haskell武士，但是他们应该至少了解 Haskell 能提供什么。学习 Haskell 可以开阔你的想法。
 
@@ -18,7 +27,7 @@ tags: [Haskell]
 
 Haskell 则十分不同。它用了许多我以前从未听过的概念，其中的许多概念将会帮助你成为更好的程序员。
 
-但是学习 Haskell 是困难的。至少对我来说是这样。这篇文章中我会提供我学习时不明白的内容。
+但是学习 Haskell 是困难的。至少对我来说是这样。这篇文章中我会提供我学习时不明白的相关内容。
 
 这篇文章当然会很难追随。这是有意为之的。学习 Haskell 没有捷径，会是困难而且充满挑战的。但是我相信这是一件很好的事情。因为它的困难使得 Haskell 如此有趣。
 
@@ -41,127 +50,161 @@ Haskell 则十分不同。它用了许多我以前从未听过的概念，其中
 5. 附录：
 	+ 更多关于无限树的东西；一个关于面向数学的无限树讨论
 		
-		
-注意：每当你看到分隔符以及一个以"lhs"结尾的文件名，你可以惦记文件名来下载这个文件。如果你以"文件名.lhs"的形式保存，你可以用一下语句运行它
-		runhaskell filename.lhs
-		
-有一些可能无法使用，但大部分可以正常使用。你将会在下面看到一个链接。
 
 # 1. 简介
 ## 1.1 安装
-here is a pic
+![]({{ site.RES_PATH }}/img/haskell-1.jpg)
 
 [Haskell Platform](http://www.haskell.org/platform)是安装 Haskell的标准方式。
 
 工具：
 - ghc:编译器，类似于 gcc 之于 C
-- ghci：**交互式 Haskell解释器(REPL)**
+- ghci：交互式 Haskell解释器(REPL)
 - runhaskell:无需编译就能执行一个程序。方便但是相比编译过的程序要慢得多。
 
-## 1.2 别害怕
-here is a pic
+## 1.2 不要畏惧
+![]({{ site.RES_PATH }}/img/haskell-2.jpg)
 
-许多关于 Haskell 的书籍或者文章会以介绍深奥的公式(快读排序，斐波那契等等)来开篇。我会做相反的事情。首先我不会给你任何 Haskell 的超级力量。我会以 Haskell 和其它编程语言的相似点开始。**让我们跳到强制的"Hello World"。**
+许多关于 Haskell 的书籍或者文章会以介绍深奥的公式(快读排序，斐波那契等等)来开篇。我会做相反的事情。首先我不会给你任何 Haskell 的超级力量。我会以 Haskell 和其它编程语言的相似点开始。让我们跳到一贯的"Hello World"。
 
-	main = putStrLn "Hello World!"
+{% highlight hs startinline linenos  %}
+main = putStrLn "Hello World!"
+{% endhighlight %} 
 		
-要运行这段代码，你可以保存到"hello.hs"里并且输入一下命令
+要运行这段代码，你可以保存到"hello.hs"里并且输入以下命令
 
-	➜  haskell  >runhaskell ./hello.hs
-	Hello World!
+{% highlight hs startinline linenos  %}
+➜  haskell  >runhaskell ./hello.hs
+Hello World!
+{% endhighlight %} 
 		
-你也可以下载**能读能写的 Haskell 源码**。你可以在简介标题的正上方看到一个链接。下载这个叫00_hello_world.lhs 的文件，并且执行下面的命令：
+你也可以下载能读能写的 Haskell 源码。你可以在简介标题的正上方看到一个链接。下载这个叫00_hello_world.lhs 的文件，并且执行下面的命令：
 
-	➜  haskell  >runhaskell 00_hello_world.lhs
-	Hello World!
-		
-接下来是一个询问你姓名然后回复"hello"加你输入的名字的程序：
+{% highlight hs startinline linenos  %}
+➜  haskell  >runhaskell 00_hello_world.lhs
+Hello World!
+{% endhighlight %} 
 
-	main = do
-        print "What is your name?"
-        name <- getLine
-        print ("Hello " ++ name ++ "!")
+接下来是一个询问你姓名然后用你输入的名字输出"hello"的程序：
+
+{% highlight hs startinline linenos  %}
+main = do
+    print "What is your name?"
+    name <- getLine
+    print ("Hello " ++ name ++ "!")
+{% endhighlight %} 
+
         
 首先，让我们将这段代码与几种命令式语言中的相似程序比较一下：
 
-	# Python
-	print "What is your name?"
-	name = raw_input()
-	print "Hello %s!" % name	
-<br>
-
-	# Ruby
-	puts "What is your name?"
-	name = gets.chomp
-	puts "Hello #{name}!"
-<br>
+{% highlight hs startinline linenos  %}
+# Python
+print "What is your name?"
+name = raw_input()
+print "Hello %s!" % name
+{% endhighlight %} 
 	
-	// In C
-	#include <stdio.h>
-	int main (int argc, char **argv) {
-		char name[666]; // <- An Evil Number!
-		// What if my name is more than 665 character long?
-	   printf("What is your name?\n"); 
-	   scanf("%s", name);
-	   printf("Hello %s!\n", name);
-	   return 0;
-	}
+{% highlight rb startinline linenos  %}
+# Ruby
+puts "What is your name?"
+name = gets.chomp
+puts "Hello #{name}!"
+{% endhighlight %} 
+
+{% highlight c startinline linenos  %}
+// In C
+#include <stdio.h>
+int main (int argc, char **argv) {
+	char name[666]; // <- An Evil Number!
+	// What if my name is more than 665 character long?
+   printf("What is your name?\n"); 
+   scanf("%s", name);
+   printf("Hello %s!\n", name);
+   return 0;
+}
+{% endhighlight %} 
 	
-结构是相同的，但是有一些语法差异。这篇教程的主要部分将会专门解释为什么。
 
-在 Haskell 里有一个 main 函数，并且每个对象都有一种类型。main 的类型是 IO()。这意味着 main会有副作用。
+	
+结构是相同的，但是有一些语法差异。这篇教程的主要篇幅将会专门解释原因。
 
-只要记得 Haskell 可以更主流的命令式语言很像。
+在 Haskell 里有一个`main`函数，并且每个对象都有一种类型。`main` 的类型是 IO()。这意味着 main会有副作用。
+
+只要记得 Haskell 可以与主流的命令式语言也有许多相似之处。
 
 ### Haskell 的基本概念
-here is a pic
+![]({{ site.RES_PATH }}/img/haskell-3.jpg)
 
-在继续教程之前你需要知道一些 Haskell的基本属性。
+在继续教程之前你需要知道一些 Haskell的基本概念。
 
 *函数式*
-Haskell 是函数式语言。如果你有命令式语言的基础，你将需要学习很多新知识。希望这些新概念能帮助你编程，即便是在命令式语言中。
+Haskell 是一门函数式语言。如果你有命令式语言的基础，你将需要学习很多新知识。希望这些新概念能帮助你编程，即便是在命令式语言中。
 
-*智能静态编写*
-与你再 C,C++或 JAVA 中的方式不同，这里的输入系统会帮助你。
+*智能静态类型*
+与你在 `C`,`C++`或 `JAVA` 中的方式不同，这种类型系统将对你大有帮助。
 
-*纯粹*
-一般来说你的函数在外面的环境不用修改该任何东西。这意味着他们不需要修改该变量的值，也不能得到用户的输入，不能在屏幕上输出，不能**发射导弹**。另一方面，并行是很容易实现的。**Haskell 使得哪里发生影响以及哪里的代码是纯净的变得清晰。**推断你的程序也更加容易。大多数 bug 将会在你程序的纯净部分被阻止。
+*纯度*
+一般来说你的函数在外面的环境不用修改该任何东西。这意味着他们不需要修改该变量的值，也不能得到用户的输入，不能在屏幕上输出，更不能发射导弹。另一方面，并行是很容易实现的。Haskell 能很清楚地了解哪里产生副作用以及哪里的代码是纯的。推断你的程序也更加容易。大多数 bug 将会在你程序的纯净部分被阻止。
 
 此外，纯净的函数遵循了Haskell 中的一个基本定律：
 > 以相同的参数应用一个函数总是会得到相同的值
 
 *惰性*
-默认懒惰是一种不常见的语言设计。默认情况下，Haskell 只有在需要的时候才会计算一些东西的值。举例来说，这样的结果就是，它能提供一种简介的方式来操控**无限结构**。
-最后，需要提醒的是你应该如何阅读 Haskell 代码。对我来说，这就像看科学论文。一些部分是清晰的，但是当你看到了一个公式，只管集中注意力并且慢慢的看。在学习 Haskell 的过程中，即便你不了解语法细节也不是很重要。如果你遇上了">>=","<$>","<-"或是别的奇怪的符号，只要忽略他们然后跟着代码流就是。
+默认懒惰是一种不常见的语言设计。默认情况下，Haskell 只有在需要的时候才会计算一些东西的值。举例来说，这样的结果就是，它能提供一种简洁的方式来操控无限结构。
+
+最后，需要提醒的是你应该如何阅读 Haskell 代码。对我来说，这就像看科学论文。一些部分是清晰的，但是当你看到了一个公式，只管集中注意力并且慢慢的看。在学习 Haskell 的过程中，即便你不了解语法细节也不是很重要。如果你遇上了`>>=`,`<$>`,`<-`或是别的奇怪的符号，只要忽略他们然后跟着代码流就是。
 
 ### 1.3.1 函数声明
 你可能习惯于这样声明函数：
-在 C 里：
-		
-	int f(int x,int y) {
-		return x*x+y*y;
-	}
-在 JAvaScript 里：
 
-	function f(x,y) {
-		return x*x+y*y;
-	}
+在 C 里：
+
+{% highlight c startinline linenos  %}
+int f(int x,int y) {
+	return x*x+y*y;
+}
+{% endhighlight %} 		
+
+
+在 JavaScript 里：
+
+{% highlight js startinline linenos  %}
+function f(x,y) {
+	return x*x+y*y;
+}
+{% endhighlight %} 
+
+
 在 Python 里：
 
-	def f(x,y):
-		return x*x+y*y
+{% highlight py startinline linenos  %}
+def f(x,y):
+	return x*x+y*y
+{% endhighlight %} 
+
+
 在 Ruby 里：
 
-	def f(x,y)
-		x*x+y*y
-	end
+{% highlight rb startinline linenos  %}
+def f(x,y)
+	x*x+y*y
+end
+{% endhighlight %} 
+
+
 在 Scheme 里
 
-	(define (f x y)
-		(+ (* x x) (* y y)))
+{% highlight scm startinline linenos  %}
+(define (f x y)
+	(+ (* x x) (* y y)))
+{% endhighlight %} 
+
 最后，Haskell 的方式是：
 
-	f x y = x*x + y*y
+{% highlight hs startinline linenos  %}
+f x y = x*x + y*y
+{% endhighlight %} 
+	
 相当简洁。没有括号，没有 def。
 
 别忘了，Haskell 大量地使用函数和**类型**。因此定义他们是很容易的。语法是特别为这些对象深思熟虑的。
@@ -169,25 +212,34 @@ Haskell 是函数式语言。如果你有命令式语言的基础，你将需要
 虽然这不是强制性的，但函数的类型信息通常是明确的。之所以不是强制性的，是因为编译器足够聪明来为你指定类型。这是一个好主意，因为它表明了意图和**理解**。
 
 让我们来小试一下。
-	
+{% highlight hs startinline linenos  %}
+
+{% endhighlight %} 	
 	-- We declare the type using ::
 	f :: Int -> Int -> Int
 	f x y = x*x + y*y
 
 	main = print (f 2 3)
 <br>
-	
+
+{% highlight hs startinline linenos  %}
+
+{% endhighlight %} 	
 	➜  haskell  >runhaskell very_basic.hs
 	13	
 现在尝试下面的程序
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	➜  haskell  >more very_basic1.hs
 	f :: Int -> Int -> Int
 	f x y = x*x + y*y
 
 	main = print (f 2.3 4.2)
 你应该会看到以下错误
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	very_basic1.hs:4:17:
     	No instance for (Fractional Int) arising from the literal `2.3'
     	Possible fix: add an instance declaration for (Fractional Int)
@@ -196,14 +248,18 @@ Haskell 是函数式语言。如果你有命令式语言的基础，你将需要
     	In the expression: print (f 2.3 4.2)
 上面的问题在于：4.2不是 int 型。
 解决方案是现在不要为 f 申明类型，让 Haskell 为我们推断最可能的类型。
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	f x y = x*x + y*y
 
 	main = print (f 2.3 4.2)
 它成功了！幸运的是，我们不需要为一个新函数声明每一种单一类型。比如说，在 C 里，你需要定义一个针对 int 型的函数，以及 floart 性，long 型，double 型等等。
 
 但是，我们应该声明哪个类型。为了知道 Haskell 给我们发现的类型，只需要启动 ghci：
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	➜  haskell  >ghci
 	GHCi, version 7.6.3: http://www.haskell.orgghc/  :? for help
 	Loading package ghc-prim ... linking ... done.
@@ -243,7 +299,9 @@ Num是个**类型类**。类型类可以理解成一些类型的集合。Num 只
 是的，这十分奇怪。事实上，Haskell 里没有函数会真的拥有两个参数。相反，所有函数都只有一个参数。**但是我们注意到采用两个参数和采用一个参数然后返回一个将第二个参数作为参数的函数是等价的**。
 
 更准确的说，`f 3 4`等价于`(f 3) 4`。注意`f 3`是一个函数：
-	
+{% highlight hs startinline linenos  %}
+
+{% endhighlight %} 	
 	f :: Num a => a -> a -> a
 	
 	g :: Num a => a -> a
@@ -252,7 +310,9 @@ Num是个**类型类**。类型类可以理解成一些类型的集合。Num 只
 	g y ⇔ 3*3 + y*y
 	
 函数存在另一个符号。符号 lambda 允许我们不指定名称就创建函数。这种函数叫作匿名函数。我们也可以这样写：
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	g = \y -> 3*3 +y*y
 	
 使用`\`是因为它看起来像`λ`并且在 ASCII 码中。
@@ -260,7 +320,9 @@ Num是个**类型类**。类型类可以理解成一些类型的集合。Num 只
 如果你不习惯函数式编程，**你应该开始头大了**。现在是时候做一个真正的应用了。
 
 但是在那之前，我们应该先确保类型系统如我们希望的那样运作：
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	f :: Num a => a -> a -> a
 	f x y =x*x +y*y
 	
@@ -269,7 +331,9 @@ Num是个**类型类**。类型类可以理解成一些类型的集合。Num 只
 这可以运行，因为`3`对于零数，不管是 Float 还是 Integer 都是合法的表示方法。由于`2.4`是个分数，`3`会被转化成分数。
 
 如果我们强制这个函数在不同类型下运行，结果会失败：
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	f :: Num a => a -> a -> a
 	f x y =x*x +y*y
 	
@@ -292,11 +356,15 @@ here is a pic
 
 ## 2.1 符号
 **算术**
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	3 + 2 * 6 / 3 ⇔ 3 + ((2*6)/3)
 	
 **逻辑**
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	True || False ⇒ True
 	True && False ⇒ False
 	True == False ⇒ False
@@ -313,7 +381,9 @@ here is a pic
 	102844034832575377634685573909834406561420991602098741459288064
 	
 是的。就连有理数也一样。但是你得先导入`Data.Ratio`模块：
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	Prelude> :m Data.Ratio
 	Prelude Data.Ratio> (11%15)*(5%3)
 	11 % 9	
@@ -335,7 +405,9 @@ here is a pic
 **字符串**
 
 Haskell 里字符串是一个所有元素都是`Char`型的列表。
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	'a' :: Char
 	"a" :: [Char]
 	""  ⇔ []
@@ -404,14 +476,18 @@ Haskell 里字符串是一个所有元素都是`Char`型的列表。
 	
 *测试*
 绝对值函数的一种实现方式如下。
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	absolute :: (Ord a, Num a) => a -> a
 	absolute x = if x >= 0 then x else -x
 	
 请注意，Haskell 符号`if..then..else..`和 C 运算符`¤?¤:¤`很像。千万别忘了`else`。
 
 另一个等价的版本：
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	absolute' x
 	    | x >= 0 = x
 	    | otherwise = -x
@@ -431,7 +507,9 @@ here is a pic
 	例如：`[1,2,3,4,5] ⇒ 2 + 4 ⇒ 6`
 	
 为了说明函数式方法和命令式方法的不同，我会以提供命名式解决方法开始(使用 JavaScript)：
+{% highlight js startinline linenos  %}
 
+{% endhighlight %} 
 	function evenSum(list) {
 		var result = 0;
 		
@@ -447,7 +525,9 @@ here is a pic
 	备注：递归一般被认为是命令式语言中很慢的方式。但这一般在函数式编程中不会是问题。大多数实践中 Haskell 能高效地处理递归函数。
 	
 接下来是`C`语言版的递归函数。请注意为了简单起见，我假定这个整型列表以第一个`0`结尾。
+{% highlight c startinline linenos  %}
 
+{% endhighlight %} 
 	int evenSum(int *list) {
 	    return accumSum(0,list);
 	}
@@ -469,25 +549,33 @@ here is a pic
 	}
 	
 把这段代码记在心里。我们会把它翻译到 Haskell 中去。然后首先我需要介绍三个简单而实用的函数，我们一会儿会用到：
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	even :: Integral a => a -> Bool
 	head :: [a] -> a
 	tail :: [a] -> [a]
 	
 `even`会盘度啊一个函数是否是偶数。
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	even :: Integral a => a -> Bool
 	even 3 ⇒ False
 	even 2 ⇒ True
 	
 `head`会返回列表的第一个元素：
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	head :: [a] -> a
 	head [1,2,3] ⇒ 1
 	head [] ⇒ ERROR
 	
 `tail`会返回列表的所有元素，除了第一个：
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	tailf :: [a] -> [a]
 	tail [1,2,3] ⇒ [2,3]
 	tail [3] ⇒ []
@@ -495,7 +583,9 @@ here is a pic
 请注意对任何非空列表`l`，都有`l ⇒ (head l):(tail l)`
 
 第一种 Haskell 解决方法。函数`evenSum`会返回列表中所有偶数数字的和：
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	-- Version 1
 	evenSum :: [Integer] -> Integer
 
@@ -510,7 +600,9 @@ here is a pic
 												else accumSum n xs
 问题1：parse error '='		
 要测试一个函数可以使用`ghci`：
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	Prelude> :load 11_Functions.lhs
 	[1 of 1] Compiling Main             	( 11_Functions.lhs, interpreted )
 	Ok, modules loaded: Main.
@@ -518,7 +610,9 @@ here is a pic
 	6
 	
 下面是执行过程示例 **注2**：
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	*Main> evenSum [1..5]
 	accumSum 0 [1,2,3,4,5]
 	1 is odd
@@ -536,11 +630,15 @@ here is a pic
 	0+6
 	6
 从命令式语言的角度一切看起来都是正确的。实际上，许多地方可以改进。首先，我们归纳类型。
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	evenSum :: Integral a => [a] -> a
 	
 然后，我们使用利用`where`或`letl`的子函数。这种方式下`accumSum`函数不会污染我们模块的命名空间。
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	-- Version 2
 	evenSum :: Integral a => [a] -> a
 
@@ -554,7 +652,9 @@ here is a pic
                             then accumSum (n+x) xs
                             else accumSum n xs	
 接下来我们将使用模式匹配。
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	-- Version 3
 	evenSum l = accumSum 0 l
 	    where 
@@ -566,32 +666,44 @@ here is a pic
 模式匹配是什么。使用值来代替一般的变量名称 **注3**.
 
 与`foo l = if l == [] then <x> else <y>`不同，你只要简单地声明：
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	foo [] =<x>
 	foo l =<y>
 
 但模式匹配可以做的还有更多。它也能检查一个复杂值的内部数据。我们可以将
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	foo l = let x = head l
 	            xs = tail l
 	        in if even x
 	            then foo (n+x) xs
 	            else foo n xs
 替换为
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	foo (x:xs) = if even x
 							then foo (n+x) xs
 							else foo n xs
 这是很有用的特色。这使得代码精炼而又易于阅读。
 
 Haskell 里你可以通过**η压缩**来简化函数定义。比如说，要简化：
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	f x = (some expression) x
 你可以简化的写成
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	f = some expression
 我们用这种方法来去掉`l`：
+{% highlight hs startinline linenos  %}
 
+{% endhighlight %} 
 	-- Version 4
 	evenSum :: Integral a => [a] -> a
 
