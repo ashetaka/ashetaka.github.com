@@ -53,7 +53,7 @@ Haskell 则十分不同。它用了许多我以前从未听过的概念，其中
 
 # 1. 简介
 ## 1.1 安装
-![]({{ site.RES_PATH }}/img/haskell-1.jpg)
+![]({{ site.RES_PATH }}/img/haskell-1.png)
 
 [Haskell Platform](http://www.haskell.org/platform)是安装 Haskell的标准方式。
 
@@ -207,168 +207,173 @@ f x y = x*x + y*y
 	
 相当简洁。没有括号，没有 def。
 
-别忘了，Haskell 大量地使用函数和**类型**。因此定义他们是很容易的。语法是特别为这些对象深思熟虑的。
-### 1.3.2 一个**类型**例子
-虽然这不是强制性的，但函数的类型信息通常是明确的。之所以不是强制性的，是因为编译器足够聪明来为你指定类型。这是一个好主意，因为它表明了意图和**理解**。
+别忘了，Haskell 大量地使用了函数和类型。因此定义他们是很容易的。语法是特别为这些对象深思熟虑的。
+### 1.3.2 一个类型例子
+虽然这不是强制性的，但函数的类型信息通常是明确的。之所以不是强制性的，是因为编译器足够聪明来为你指定类型。这是一个好主意，因为它表明了意图和理解。
 
 让我们来小试一下。
 {% highlight hs startinline linenos  %}
+-- We declare the type using ::
+f :: Int -> Int -> Int
+f x y = x*x + y*y
 
+main = print (f 2 3)
 {% endhighlight %} 	
-	-- We declare the type using ::
-	f :: Int -> Int -> Int
-	f x y = x*x + y*y
-
-	main = print (f 2 3)
-<br>
 
 {% highlight hs startinline linenos  %}
-
+➜  haskell  >runhaskell very_basic.hs
+13	
 {% endhighlight %} 	
-	➜  haskell  >runhaskell very_basic.hs
-	13	
+
 现在尝试下面的程序
+
 {% highlight hs startinline linenos  %}
-
+f :: Int -> Int -> Int
+f x y = x*x + y*y
+main = print (f 2.3 4.2)
 {% endhighlight %} 
-	➜  haskell  >more very_basic1.hs
-	f :: Int -> Int -> Int
-	f x y = x*x + y*y
 
-	main = print (f 2.3 4.2)
 你应该会看到以下错误
 {% highlight hs startinline linenos  %}
-
+very_basic1.hs:4:17:
+	No instance for (Fractional Int) arising from the literal `2.3'
+	Possible fix: add an instance declaration for (Fractional Int)
+	In the first argument of `f', namely `2.3'
+	In the first argument of `print', namely `(f 2.3 4.2)'
+	In the expression: print (f 2.3 4.2)
 {% endhighlight %} 
-	very_basic1.hs:4:17:
-    	No instance for (Fractional Int) arising from the literal `2.3'
-    	Possible fix: add an instance declaration for (Fractional Int)
-    	In the first argument of `f', namely `2.3'
-    	In the first argument of `print', namely `(f 2.3 4.2)'
-    	In the expression: print (f 2.3 4.2)
-上面的问题在于：4.2不是 int 型。
-解决方案是现在不要为 f 申明类型，让 Haskell 为我们推断最可能的类型。
+
+上面的问题在于：`4.2`不是 int 型。
+
+解决方案是现在不要为` f `申明类型，让 Haskell 为我们推断最可能的类型。
 {% highlight hs startinline linenos  %}
+f x y = x*x + y*y
 
+main = print (f 2.3 4.2)
 {% endhighlight %} 
-	f x y = x*x + y*y
 
-	main = print (f 2.3 4.2)
 它成功了！幸运的是，我们不需要为一个新函数声明每一种单一类型。比如说，在 C 里，你需要定义一个针对 int 型的函数，以及 floart 性，long 型，double 型等等。
 
-但是，我们应该声明哪个类型。为了知道 Haskell 给我们发现的类型，只需要启动 ghci：
-{% highlight hs startinline linenos  %}
+但是，我们应该声明哪个类型呢？为了知道 Haskell 给我们发现的类型，只需要启动 ghci：
 
+{% highlight hs startinline linenos  %}
+➜  haskell  >ghci
+GHCi, version 7.6.3: http://www.haskell.orgghc/  :? for help
+Loading package ghc-prim ... linking ... done.
+Loading package integer-gmp ... linking ... done.
+Loading package base ... linking ... done.
+Prelude> let f x y = x*x + y*y
+Prelude> :type f
+f :: Num a => a -> a -> a
 {% endhighlight %} 
-	➜  haskell  >ghci
-	GHCi, version 7.6.3: http://www.haskell.orgghc/  :? for help
-	Loading package ghc-prim ... linking ... done.
-	Loading package integer-gmp ... linking ... done.
-	Loading package base ... linking ... done.
-	Prelude> let f x y = x*x + y*y
-	Prelude> :type f
-	f :: Num a => a -> a -> a
+
 	
 呃？这是什么奇怪的类型？
 首先让我们把注意力放到右边的部分`a -> a ->a`。为了理解这一点，先看看下面渐进例子的表格：
 
-<table>
-<tr>
-<td>The written type</td>
-<td>Its meaning</td>
-</tr>
-</table>
+|类型|含义|
+|:---|:---|
+|Int|整型|
+|Int -> Int|从整型到整型的函数类型|
+|Float -> Int|从单精度浮点型到整型的函数类型|
+|a -> Int|从任意类型到整型的函数类型|
+|a -> a||从任意类型到任意类型的函数类型
+|a -> a -> a|从两个任意类型参数到相同类型的函数类型|
 
 
-在类型`a -> a ->a`中，字母 a 是个类型变量。它的意思是 f 是一个拥有两个参数且参数与返回值都有相同类型的函数。类型变量 a 可以采用许多不同的类型值。比如说 Int，或者是 Integer，或者是 Float...
+在类型`a -> a ->a`中，字母 a 是个类型变量。它的意思是 f 是一个拥有两个参数且参数与返回值都有相同类型的函数。类型变量` a `可以采用许多不同的类型值。比如说 `Int`，或者是 `Integer`，或者是 `Float`...
 
 因此与 C 中强制指定类型，并且需要为函数声明类型(如 int、long、float、double 等等)不同，我们只需要像动态类型语言一样声明函数即可。
 
-有时候这被叫作参数动态化。**这也能被叫作鱼与熊掌可以兼得。**
+有时候这被叫作参数动态化。这也能被叫作鱼与熊掌可以兼得。
 
 一般来说，`a` 可以是任何类型，比如 `string` 或者 `Int`，但也可以是更复杂的类型，像 `Tree` 这样的，或是别的函数等等。但是这里我们的类型有个前缀`Num a =>`
 
-Num是个**类型类**。类型类可以理解成一些类型的集合。Num 只包含一些行为像数字的类型。更准确地说，Num 是个包含一些类型的类，这些类型会执行一些特定的函数，尤其是`(+)`和`(*)`。
+Num是个类型类。类型类可以理解成一些类型的集合。Num 只包含一些行为像数字的类型。更准确地说，Num 是个包含一些类型的类，这些类型会执行一些特定的函数，尤其是`(+)`和`(*)`。
 
-类型类是很强大的语言构想。我们可以用它做一些不可想象的强大的东西。关于这一点，后面的文章会介绍的更多。
+类型类是很强大的语言构造。我们可以用它做一些不可想象的强大的东西。关于这一点，后面的文章会介绍的更多。
 
 最后，`Num a => a-> a ->a`的意思是：
 
-让 `a` 是属于 Num 类型类的一种类型。这是一个由类型 `a` 到类型`a -> a`的函数。
+ `a` 是属于 Num 类型类的一种类型。这是一个由类型 `a` 到类型`a -> a`的函数。
 
-是的，这十分奇怪。事实上，Haskell 里没有函数会真的拥有两个参数。相反，所有函数都只有一个参数。**但是我们注意到采用两个参数和采用一个参数然后返回一个将第二个参数作为参数的函数是等价的**。
+是的，这十分奇怪。事实上，Haskell 里没有函数会真的拥有两个参数。相反，所有函数都只有一个参数。但是我们将发现采用两个参数和采用一个参数然后返回一个函数将第二个参数作为参数是等价的。
 
 更准确的说，`f 3 4`等价于`(f 3) 4`。注意`f 3`是一个函数：
-{% highlight hs startinline linenos  %}
 
+{% highlight hs startinline linenos  %}
+f :: Num a => a -> a -> a
+
+g :: Num a => a -> a
+g = f 3
+
+g y ⇔ 3*3 + y*y
 {% endhighlight %} 	
-	f :: Num a => a -> a -> a
-	
-	g :: Num a => a -> a
-	g = f 3
-	
-	g y ⇔ 3*3 + y*y
+
 	
 函数存在另一个符号。符号 lambda 允许我们不指定名称就创建函数。这种函数叫作匿名函数。我们也可以这样写：
-{% highlight hs startinline linenos  %}
 
+{% highlight hs startinline linenos  %}
+g = \y -> 3*3 +y*y
 {% endhighlight %} 
-	g = \y -> 3*3 +y*y
+	
 	
 使用`\`是因为它看起来像`λ`并且在 ASCII 码中。
 
-如果你不习惯函数式编程，**你应该开始头大了**。现在是时候做一个真正的应用了。
+如果你不习惯函数式编程，你应该开始头大了。现在是时候写一个真正的程序了。
 
 但是在那之前，我们应该先确保类型系统如我们希望的那样运作：
-{% highlight hs startinline linenos  %}
 
+{% highlight hs startinline linenos  %}
+f :: Num a => a -> a -> a
+f x y =x*x +y*y
+
+main = print (f 3 2.4)
 {% endhighlight %} 
-	f :: Num a => a -> a -> a
-	f x y =x*x +y*y
+
 	
-	main = print (f 3 2.4)
-	
-这可以运行，因为`3`对于零数，不管是 Float 还是 Integer 都是合法的表示方法。由于`2.4`是个分数，`3`会被转化成分数。
+这可以运行，因为`3`对于不管是 Float 还是 Integer 都是合法的表示方法。由于`2.4`是个分数，`3`会被转化成分数。
 
 如果我们强制这个函数在不同类型下运行，结果会失败：
-{% highlight hs startinline linenos  %}
 
+{% highlight hs startinline linenos  %}
+f :: Num a => a -> a -> a
+f x y =x*x +y*y
+
+x :: Int
+x = 3
+y :: Float
+y = 2.4
+main = print (f x y) -- 不会正常运行，因为 x 和 y 的类型不一致
 {% endhighlight %} 
-	f :: Num a => a -> a -> a
-	f x y =x*x +y*y
-	
-	x :: Int
-	x = 3
-	y :: Float
-	y = 2.4
-	main = print (f x y) -- 不会正常运行，因为 x 和 y 的类型不一致
+
 	
 编译器会报错。这两个参数必须是相同类型。
 
 如果你认为这是个坏想法，并且编译器应该为你把一种类型转化成另一种，你真的应该看看这个极好(并且有趣)的视频:[WAT](https://www.destroyallsoftware.com/talks/wat)
 
 # 2.Haskell 本质
-here is a pic
+![]({{ site.RES_PATH }}/img/haskell-4.jpg) 
 
-我建议你应该浏览这个部分。把它作为一个参考。Haskell有许多特色。许多信息在这都漏掉了。如果有的符号让你奇怪就回到这来。
+我建议你略读这个部分。把它作为一个参考。Haskell有许多特色。许多信息在这都漏掉了。如果有的符号让你奇怪就回到这来。
 
 我用符号`⇔`来表示两个表达式是等价的。这是个元符号，`⇔`在 Haskell 中并不存在。我也会用`⇒`来表示表达式的返回值是什么。
 
 ## 2.1 符号
 **算术**
 {% highlight hs startinline linenos  %}
-
+3 + 2 * 6 / 3 ⇔ 3 + ((2*6)/3)
 {% endhighlight %} 
-	3 + 2 * 6 / 3 ⇔ 3 + ((2*6)/3)
+	
 	
 **逻辑**
 {% highlight hs startinline linenos  %}
-
+True || False ⇒ True
+True && False ⇒ False
+True == False ⇒ False
+True /= False ⇒ True 符号(/=)是不等于的意思
 {% endhighlight %} 
-	True || False ⇒ True
-	True && False ⇒ False
-	True == False ⇒ False
-	True /= False ⇒ True 符号(/=)是不等于的意思
+
 	
 **幂**
 
@@ -382,11 +387,11 @@ here is a pic
 	
 是的。就连有理数也一样。但是你得先导入`Data.Ratio`模块：
 {% highlight hs startinline linenos  %}
-
+Prelude> :m Data.Ratio
+Prelude Data.Ratio> (11%15)*(5%3)
+11 % 9	
 {% endhighlight %} 
-	Prelude> :m Data.Ratio
-	Prelude Data.Ratio> (11%15)*(5%3)
-	11 % 9	
+
 	
 **列表**
 
@@ -404,15 +409,15 @@ here is a pic
 
 **字符串**
 
-Haskell 里字符串是一个所有元素都是`Char`型的列表。
+Haskell 里的字符串是一个所有元素都是`Char`型的列表。
 {% highlight hs startinline linenos  %}
-
+'a' :: Char
+"a" :: [Char]
+""  ⇔ []
+"ab" ⇔ ['a','b'] ⇔  'a':"b" ⇔ 'a':['b'] ⇔ 'a':'b':[]
+"abc" ⇔ "ab"++"c"
 {% endhighlight %} 
-	'a' :: Char
-	"a" :: [Char]
-	""  ⇔ []
-	"ab" ⇔ ['a','b'] ⇔  'a':"b" ⇔ 'a':['b'] ⇔ 'a':'b':[]
-	"abc" ⇔ "ab"++"c"
+
 	
 	备注：真实代码中你不应该使用字符列表来表示文本。大多数时候你应该用`Data.Text`代替。如果你想表示一个 ASCII 字符流，你应该用`Data.ByteString`。
 	
@@ -452,7 +457,7 @@ Haskell 里字符串是一个所有元素都是`Char`型的列表。
 	x :: Int            ⇔ x 是 Int 型
 	x :: a              ⇔ x 可以是任何类型
 	x :: Num a => a     ⇔ x 可以是任何属于 Num 类的类型 
-	f :: a -> b         ⇔ f 是**由 a 到 b 的函数**
+	f :: a -> b         ⇔ f 是由 a 到 b 的函数
 	f :: a -> b -> c    ⇔ f 是由 a 到 (b→c)的函数
 	f :: (a -> b) -> c  ⇔ f 是由 (a→b) 到 c的函数
 	
@@ -460,175 +465,195 @@ Haskell 里字符串是一个所有元素都是`Char`型的列表。
 
 *中缀表示法*
 
-	square :: Num a => a -> a
-	square x = x^2
+{% highlight hs startinline linenos  %}
+square :: Num a => a -> a
+square x = x^2
+{% endhighlight %} 
+
 	
 注意`^`用的是中缀表示法。对于每一个中缀运算符都有相关的前缀表示法。你只需要把它放在括号里。
 
-	square' x = (^) x 2
-	square'' x = (^2) x
-我们可以在两边都去掉`x`!这就是**η压缩**。
+{% highlight hs startinline linenos  %}
+square' x = (^) x 2
+square'' x = (^2) x
+{% endhighlight %} 
 
-	square''' = (^2)
+我们可以在两边都去掉`x`!这就是η-reduction。
+
+{% highlight hs startinline linenos  %}
+square''' = (^2)
+{% endhighlight %} 
+	
 注意我们在名字用用`'`来声明函数。请看下面：
 
-	square ⇔ square' ⇔ square'' ⇔ square'''
+{% highlight hs startinline linenos  %}
+square ⇔ square' ⇔ square'' ⇔ square'''
+{% endhighlight %} 
+	
 	
 *测试*
 绝对值函数的一种实现方式如下。
-{% highlight hs startinline linenos  %}
 
+{% highlight hs startinline linenos  %}
+absolute :: (Ord a, Num a) => a -> a
+absolute x = if x >= 0 then x else -x
 {% endhighlight %} 
-	absolute :: (Ord a, Num a) => a -> a
-	absolute x = if x >= 0 then x else -x
+
 	
 请注意，Haskell 符号`if..then..else..`和 C 运算符`¤?¤:¤`很像。千万别忘了`else`。
 
 另一个等价的版本：
+
 {% highlight hs startinline linenos  %}
-
+absolute' x
+    | x >= 0 = x
+    | otherwise = -x
 {% endhighlight %} 
-	absolute' x
-	    | x >= 0 = x
-	    | otherwise = -x
 
-	符号警示：缩进在 Haskell 中十分重要。和 Python 一样，会缩进会毁了你的代码。
+
+	符号警示：缩进在 Haskell 中十分重要。和 Python 一样，糟糕的缩进会毁了你的代码。
 	
 # 3. 噩梦
 现在开始增加难度。
 ##3.1 函数式风格
-here is a pic
+![]({{ site.RES_PATH }}/img/haskell-5.jpg) 
 
-在这一部分，我会给出一个简单例子来阐述 Haskell 提供的让人印象深刻的重构能力。我们会选择一个问题并且以标准的命名式方法来解决它。然后我会改进代码。最终结果会更简介、更容易去修改。
+在这一部分，我会用一个简单例子来阐述 Haskell 提供的让人印象深刻的重构能力。我们会选择一个问题并且以标准的命名式方法来解决它。然后我会改进代码。最终结果会更简洁、更容易适应。
 
 让我们解决下面这个问题：
 
 	给定一个整数列表，然会列表中偶数数字的和。
 	例如：`[1,2,3,4,5] ⇒ 2 + 4 ⇒ 6`
 	
-为了说明函数式方法和命令式方法的不同，我会以提供命名式解决方法开始(使用 JavaScript)：
+为了说明函数式方法和命令式方法的不同，我会以命名式解决方法开始(使用 JavaScript)：
 {% highlight js startinline linenos  %}
-
+function evenSum(list) {
+	var result = 0;
+	
+	for (var i=0; i< list.length ; i++) {
+		if (list[i] % 2 ==0) {
+            result += list[i];
+     }
+   }
+   return result;
+}
 {% endhighlight %} 
-	function evenSum(list) {
-		var result = 0;
-		
-		for (var i=0; i< list.length ; i++) {
-			if (list[i] % 2 ==0) {
-	            result += list[i];
-	     }
-	   }
-	   return result;
-	}
+
 在 Haskell 中，恰恰相反，我们不需要变量或是 for 循环。一种不用循环得到相同结果的方案是使用递归。
 
 	备注：递归一般被认为是命令式语言中很慢的方式。但这一般在函数式编程中不会是问题。大多数实践中 Haskell 能高效地处理递归函数。
 	
 接下来是`C`语言版的递归函数。请注意为了简单起见，我假定这个整型列表以第一个`0`结尾。
+
 {% highlight c startinline linenos  %}
+int evenSum(int *list) {
+    return accumSum(0,list);
+}
 
+int accumSum(int n, int *list) {
+    int x;
+    int *xs;
+    if (*list == 0) { // if the list is empty
+        return n;
+    } else {
+        x = list[0]; // let x be the first element of the list
+        xs = list+1; // let xs be the list without x
+			if ( 0 == (x%2) ) { // if x is even
+	            return accumSum(n+x, xs);
+        } else {
+            return accumSum(n, xs);
+        }
+    }
+}
 {% endhighlight %} 
-	int evenSum(int *list) {
-	    return accumSum(0,list);
-	}
 
-	int accumSum(int n, int *list) {
-	    int x;
-	    int *xs;
-	    if (*list == 0) { // if the list is empty
-	        return n;
-	    } else {
-	        x = list[0]; // let x be the first element of the list
-	        xs = list+1; // let xs be the list without x
-				if ( 0 == (x%2) ) { // if x is even
-		            return accumSum(n+x, xs);
-	        } else {
-	            return accumSum(n, xs);
-	        }
-	    }
-	}
 	
-把这段代码记在心里。我们会把它翻译到 Haskell 中去。然后首先我需要介绍三个简单而实用的函数，我们一会儿会用到：
-{% highlight hs startinline linenos  %}
+记住这段代码。我们会把它翻译成 Haskell 。首先我需要介绍三个简单而实用的函数，我们一会儿会用到：
 
+{% highlight hs startinline linenos  %}
+even :: Integral a => a -> Bool
+head :: [a] -> a
+tail :: [a] -> [a]
 {% endhighlight %} 
-	even :: Integral a => a -> Bool
-	head :: [a] -> a
-	tail :: [a] -> [a]
+
 	
-`even`会盘度啊一个函数是否是偶数。
-{% highlight hs startinline linenos  %}
+`even`会判断一个函数是否是偶数。
 
+{% highlight hs startinline linenos  %}
+even :: Integral a => a -> Bool
+even 3 ⇒ False
+even 2 ⇒ True
 {% endhighlight %} 
-	even :: Integral a => a -> Bool
-	even 3 ⇒ False
-	even 2 ⇒ True
+
 	
 `head`会返回列表的第一个元素：
-{% highlight hs startinline linenos  %}
 
+{% highlight hs startinline linenos  %}
+head :: [a] -> a
+head [1,2,3] ⇒ 1
+head [] ⇒ ERROR
 {% endhighlight %} 
-	head :: [a] -> a
-	head [1,2,3] ⇒ 1
-	head [] ⇒ ERROR
+
 	
 `tail`会返回列表的所有元素，除了第一个：
-{% highlight hs startinline linenos  %}
 
+{% highlight hs startinline linenos  %}
+tailf :: [a] -> [a]
+tail [1,2,3] ⇒ [2,3]
+tail [3] ⇒ []
+tail [] ⇒ ERROR
 {% endhighlight %} 
-	tailf :: [a] -> [a]
-	tail [1,2,3] ⇒ [2,3]
-	tail [3] ⇒ []
-	tail [] ⇒ ERROR
+
 请注意对任何非空列表`l`，都有`l ⇒ (head l):(tail l)`
 
 第一种 Haskell 解决方法。函数`evenSum`会返回列表中所有偶数数字的和：
+
 {% highlight hs startinline linenos  %}
+-- Version 1
+evenSum :: [Integer] -> Integer
 
+evenSum l = accumSum 0 l
+
+accumSum n l = if l == []
+					then n
+					else let x = head l 
+							xs = tail l 
+						in if even x
+								then accumSum (n+x) xs
+								else accumSum n xs
 {% endhighlight %} 
-	-- Version 1
-	evenSum :: [Integer] -> Integer
-
-	evenSum l = accumSum 0 l
-
-	accumSum n l = if l == []
-								then n
-								else let x = head l 
-											 xs = tail l 
-										in if even x
-												then accumSum (n+x) xs
-												else accumSum n xs
-问题1：parse error '='		
+		
 要测试一个函数可以使用`ghci`：
-{% highlight hs startinline linenos  %}
 
+{% highlight hs startinline linenos  %}
+Prelude> :load 11_Functions.lhs
+[1 of 1] Compiling Main             	( 11_Functions.lhs, interpreted )
+Ok, modules loaded: Main.
+*Main> evenSum [1..5]
+6
 {% endhighlight %} 
-	Prelude> :load 11_Functions.lhs
-	[1 of 1] Compiling Main             	( 11_Functions.lhs, interpreted )
-	Ok, modules loaded: Main.
-	*Main> evenSum [1..5]
-	6
+
 	
-下面是执行过程示例 **注2**：
+下面是执行过程示例：
 {% highlight hs startinline linenos  %}
-
+*Main> evenSum [1..5]
+accumSum 0 [1,2,3,4,5]
+1 is odd
+accumSum 0 [2,3,4,5]
+2 is even
+accumSum (0+2) [3,4,5]
+3 is odd
+accumSum (0+2) [4,5]
+4 is even
+accumSum (0+2+4) [5]
+5 is odd
+accumSum (0+2+4) []
+l == []
+0+2+4
+0+6
+6
 {% endhighlight %} 
-	*Main> evenSum [1..5]
-	accumSum 0 [1,2,3,4,5]
-	1 is odd
-	accumSum 0 [2,3,4,5]
-	2 is even
-	accumSum (0+2) [3,4,5]
-	3 is odd
-	accumSum (0+2) [4,5]
-	4 is even
-	accumSum (0+2+4) [5]
-	5 is odd
-	accumSum (0+2+4) []
-	l == []
-	0+2+4
-	0+6
-	6
+
 从命令式语言的角度一切看起来都是正确的。实际上，许多地方可以改进。首先，我们归纳类型。
 {% highlight hs startinline linenos  %}
 
