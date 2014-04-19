@@ -7,23 +7,27 @@ tags: [python]
 ---
 {% include JB/setup %}
 
-下午在[projecteuler](http://projecteuler.net/)做题的时候用了下math.pow()这个函数，发现实际结果与预期的不一致，计算结果使用科学计数法表示的。想起以前应该不是这样的，又改成内建的pow()试了下，发现这回能返回完整的计算结果。至此，才发现这两个函数还是有一点差别的。
+下午在[projecteuler](http://projecteuler.net/)做题的时候用了下math.pow()这个函数，发现实际结果与预期的不一致，计算结果是用科学计数法表示的。想起以前应该不是这样的，又改成内建的pow()试了下，发现这回能返回完整的计算结果。至此，才发现这两个函数还是有一点差别的。
 
 ### 小测试
 
 先用pydoc分别砍下两个函数的描述是否一致：
 
+{% highlight sh startinline linenos  %}
 pow(...)
     pow(x, y[, z]) -> number
 
 math.pow = pow(...)
     pow(x, y)
+{% endhighlight %} 
 
 看起来具体的实现果然有点差别呢，再进交互式界面看一下：
 
+{% highlight sh startinline linenos  %}
 >>> import math
 >>> pow is math.pow
 False
+{% endhighlight %} 
 
 至此，我们可以看到两点：
 
@@ -34,6 +38,7 @@ False
 
 首先我们拿0和-1作为参数来看一下返回的结果
 
+{% highlight sh startinline linenos  %}
 >>> pow(0,-1)
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
@@ -42,6 +47,7 @@ ZeroDivisionError: 0.0 cannot be raised to a negative power
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
 ValueError: math domain error
+{% endhighlight %} 
 
 很显然，0的-1次是没法计算的。python也分别都返回了错误，可是返回的报错信息似乎不太一样。
 
@@ -51,6 +57,7 @@ ValueError: math domain error
 
 从最开始的pydoc里我们已经发现，math.pow()接收的参数比pow()要少一个。但假如我们抛开那个参数的差别来看，就会发现math.pow()处理参数的方法也有一点不同。从[源码](http://hg.python.org/cpython/file/c7163a7f7cd2/Modules/mathmodule.c#l1781)可以看到，math.pow()直接把传入的参数转为double
 
+{% highlight py startinline linenos  %}
 static PyObject *
 math_pow(PyObject *self, PyObject *args)
 {
@@ -63,6 +70,7 @@ math_pow(PyObject *self, PyObject *args)
     x = PyFloat_AsDouble(ox);
     y = PyFloat_AsDouble(oy);
 /*...*/
+{% endhighlight %} 
 
 这里截取了该函数最开始的几行代码，可以看到传入后就被传给了double型变量，之后才进行下一步计算。
 
