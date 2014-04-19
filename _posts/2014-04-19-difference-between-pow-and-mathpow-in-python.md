@@ -78,11 +78,11 @@ math_pow(PyObject *self, PyObject *args)
 
 内建的pow()其实与`**`操作符是一个概念，它直接使用了`**`操作符的实现方式。针对不同的参数类型，`**`用了不同的实现方法，如[float](http://hg.python.org/cpython/file/6a60359556f9/Objects/floatobject.c#l807),[long](http://hg.python.org/cpython/file/c7163a7f7cd2/Objects/longobject.c#l3599),[complex](http://hg.python.org/cpython/file/c7163a7f7cd2/Objects/complexobject.c#l510)
 
-另外，如果有需要的话，可以用__pow__(),__rpow()或者__ipow__()方法来重写实现方式
+另外，如果有需要的话，可以用`__pow__()`,`__rpow()`或者`__ipow__()`方法来重写实现方式
 
 ### 覆盖默认行为
 
-[官网docs](http://docs.python.org/reference/datamodel.html#numeric-types)里有对数值类型的模拟操作讨论。如果你不确定传入参数的类型，你就必须为这个类型提供__pow__()等方法，这样你就可以使用这个操作符了。
+[官网docs](http://docs.python.org/reference/datamodel.html#numeric-types)里有对数值类型的模拟操作讨论。如果你不确定传入参数的类型，你就必须为这个类型提供`__pow__()`等方法，这样你就可以使用这个操作符了。
 
 ### 总结
 
