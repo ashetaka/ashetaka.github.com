@@ -12,7 +12,7 @@ tags: [PostgreSQL]
 
 ### 概要
 
-<div class="piccenter">
+<div class="piccenter" markdown="1">
 ![]({{ site.RES_PATH }}/img/225px-Postgresql_elephant.svg.png)
 </div>
 
