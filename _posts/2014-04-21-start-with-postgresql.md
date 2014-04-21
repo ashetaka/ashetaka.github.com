@@ -15,6 +15,9 @@ tags: [PostgreSQL]
 
 ->![]({{ site.RES_PATH }}/img/225px-Postgresql_elephant.svg.png)<-
 
+<p align="center">
+  <img src="{{ site.RES_PATH }}/img/225px-Postgresql_elephant.svg.png" />
+</p>
 
 PostgresSQL是完全开放、免费的对象-关系数据库服务器。其发音为post-GRES-que-ell，你也可以参考这个[音频文件](http://www.postgresql.org/files/postgresql.mp3)。
 
