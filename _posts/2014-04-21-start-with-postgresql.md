@@ -12,6 +12,8 @@ tags: [PostgreSQL]
 
 ### 概要
 
+![]({{ site.RES_PATH }}/img/225px-Postgresql_elephant.svg.png)
+
 PostgresSQL是完全开放、免费的对象-关系数据库服务器。其发音为post-GRES-que-ell，你也可以参考这个[音频文件](http://www.postgresql.org/files/postgresql.mp3)。
 
 ### 安装
