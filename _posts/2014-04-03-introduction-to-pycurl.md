@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "introduction to pycurl"
+title: "pycurl简介"
 description: ""
 category: ""
 tags: []
@@ -43,12 +43,32 @@ sudo ARCHFLAGS="-arch x86_64" CFLAGS=-Wunused-command-line-argument-hard-error-i
 
 看来一切顺利
 
+### 请求
 
+这是一个简单的实现返回指定url的请求结果的函数，并且假定返回的是json格式
+
+{% highlight py startinline linenos  %}
+def sendRequest(url):
+    storage = StringIO()
+    c = pycurl.Curl()
+    c.setopt(c.URL, url)
+    c.setopt(c.WRITEFUNCTION, storage.write)
+    c.perform()
+    c.close()
+    content = storage.getvalue()
+
+    decoded = json.loads(content)
+
+    return decoded
+
+{% endhighlight %} 
 
 ### 参考链接
 
-Pycurl Error : AttributeError: 'module' object has no attribute 'Curl'
+1.Pycurl Error : AttributeError: 'module' object has no attribute 'Curl'
+
 http://stackoverflow.com/questions/12078168/pycurl-error-attributeerror-module-object-has-no-attribute-curl
 
-Getting HTML with Pycurl
+2.Getting HTML with Pycurl
+
 http://stackoverflow.com/questions/6554386/getting-html-with-pycurl
