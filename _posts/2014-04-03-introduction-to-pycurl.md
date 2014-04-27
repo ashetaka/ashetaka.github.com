@@ -1,13 +1,13 @@
 ---
 layout: post
-title: "pycurl简介"
+title: "PycURL简介"
 description: ""
 category: ""
 tags: []
 ---
 {% include JB/setup %}
 
-PHP下的curl用的很多了，最近刚好在学python，发现了pycurl这个库，就正好使用了一下。
+PHP下的curl用的很多了，最近刚好在学python，发现了PycURL这个库，就正好使用了一下。
 
 ### 安装
 
