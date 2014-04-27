@@ -1,4 +1,5 @@
 .highlight { background: #002b36; }
+.highlight .lineno { color: #93a1a1 } /* Line Numbers */
 .highlight .hll { background-color: #ffffcc }
 .highlight .c { color: #93a1a1; font-style: italic } /* Comment */
 .highlight .err { color: #dc322f } /* Error */
