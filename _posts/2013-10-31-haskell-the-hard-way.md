@@ -2,7 +2,7 @@
 layout: post
 title: "努力快速学习Haskell"
 description: ""
-category: "译"
+category: "Translation"
 tags: [Haskell]
 ---
 {% include JB/setup %}

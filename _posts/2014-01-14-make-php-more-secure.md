@@ -2,7 +2,7 @@
 layout: post
 title: "让PHP代码更安全"
 description: ""
-category: "学"
+category: "learning"
 tags: [php]
 ---
 {% include JB/setup %}

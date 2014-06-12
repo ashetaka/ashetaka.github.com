@@ -2,7 +2,7 @@
 layout: post
 title: "不是计划着失败，而是失败地计划"
 description: ""
-category: "感"
+category: "Inspiration"
 tags: [心情]
 ---
 {% include JB/setup %}

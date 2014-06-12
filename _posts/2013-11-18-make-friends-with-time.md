@@ -2,7 +2,7 @@
 layout: post
 title: "把时间当作朋友"
 description: ""
-category: "读"
+category: "reading"
 tags: [读书]
 ---
 {% include JB/setup %}

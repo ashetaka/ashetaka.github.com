@@ -2,7 +2,7 @@
 layout: post
 title: "PHP40个有用建议-1"
 description: ""
-category: "译"
+category: "Traslation"
 tags: [php]
 ---
 {% include JB/setup %}
