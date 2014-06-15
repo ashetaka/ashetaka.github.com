@@ -1614,3 +1614,8 @@ img.center {
   margin-left: auto; 
   margin-right: auto;
 }
+img {
+max-width: 100%;
+height: auto;
+width: auto\9;
+}
